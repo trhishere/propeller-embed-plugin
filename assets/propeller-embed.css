@@ -1,0 +1,152 @@
+.propeller-embed {
+  margin: 1rem 0;
+}
+
+.propeller-cookie-warning {
+  max-width: 900px;
+  margin: 0 auto 16px;
+  padding: 14px 16px;
+  border: 1px solid #f0b429;
+  background: #fff8e1;
+  border-radius: 8px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.propeller-cookie-warning-text {
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.cookie-warning-detail {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #5f4b00;
+}
+
+.propeller-cookie-details {
+  margin-top: 10px;
+}
+
+.propeller-cookie-help {
+  margin-top: 8px;
+}
+
+.propeller-cookie-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.propeller-cookie-actions .retry-embed,
+.propeller-cookie-actions .open-new-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.propeller-cookie-actions .retry-embed {
+  border: 1px solid #8a8a8a;
+  background: #fff;
+  cursor: pointer;
+}
+
+.propeller-cookie-actions .open-new-tab {
+  border: 1px solid #1a73e8;
+  background: #eaf2fe;
+}
+
+.cookie-debug-log {
+  margin-top: 12px;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  max-height: 240px;
+  overflow: auto;
+  white-space: pre-wrap;
+  font-size: 12px;
+}
+
+.propeller-iframe-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.propeller-app {
+  display: block;
+  border: 0;
+  max-width: 100%;
+}
+
+.propeller-embed-error {
+  padding: 12px 14px;
+  border: 1px solid #d63638;
+  background: #fcf0f1;
+  border-radius: 6px;
+}
+
+
+.propeller-debug-panel {
+  margin-top: 12px;
+  padding: 10px;
+  background: #f6f7f7;
+  border: 1px solid #dcdcde;
+  border-radius: 6px;
+}
+
+.propeller-debug-panel-header,
+.propeller-debug-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.propeller-debug-panel-header {
+  margin-bottom: 8px;
+}
+
+.propeller-debug-instance-label {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eaf2fe;
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.propeller-debug-clear {
+  margin-left: auto;
+}
+
+.propeller-debug-meta {
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+
+.propeller-debug-panel[hidden],
+.cookie-debug-log[hidden] {
+  display: none !important;
+}
+
+.propeller-debug-meta-full {
+  flex: 1 1 100%;
+}
+
+.propeller-debug-meta code {
+  word-break: break-all;
+}
+
+
+.propeller-embed-switcher-controls { display:block; margin:0 0 16px; }
+.propeller-embed-switcher-label { display:block; margin:0 0 8px; }
+.propeller-embed-switcher-select { display:block !important; width:100%; max-width:420px; min-height:44px; padding:10px 12px; border:1px solid #c7c7c7; border-radius:8px; background:#fff; color:#111; appearance:auto; -webkit-appearance:menulist; }
+.propeller-embed-switcher-copy { margin-bottom:16px; }

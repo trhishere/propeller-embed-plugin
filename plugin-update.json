@@ -1,0 +1,18 @@
+{
+  "name": "Get Bonds",
+  "slug": "propeller-embed-plugin",
+  "version": "1.3.11",
+  "channel": "stable",
+  "homepage": "https://www.propellerbonds.com/propeller-embed-plugin",
+  "download_url": "https://www.propellerbonds.com/propeller-embed-plugins/latest-version",
+  "requires": "7.4",
+  "tested": "7.4",
+  "requires_php": "7.4",
+  "last_updated": "2026-05-12",
+  "sections": {
+    "description": "Embeds a Propeller app in WordPress with short code [propeller_embed_switcher], and [propeller_embed] with cookie guidance, retry support, one-at-a-time dropdown switching, dynamic embed initialization, and self-hosted auto-updates.",
+    "installation": "Upload the ZIP in Plugins \u2192 Add New \u2192 Upload Plugin. Activate it, then configure it under Settings \u2192 Propeller Embed.",
+    "changelog": "= 1.3.9 =\n* Added [propeller_embed_switcher] for true one-at-a-time iframe loading.\n* Added dynamic re-initialization for embeds inserted after page load.\n* Updated the bundled JSON manifest author and homepage fields.\n\n= 1.3.8 =\n* Added redundant instance fields in handshake init payload.\n* Parent now accepts instanceId aliases in iframe messages for more resilient GTM integrations."
+  },
+  "author": "Propeller Bonds"
+}
