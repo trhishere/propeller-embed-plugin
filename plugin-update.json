@@ -14,5 +14,5 @@
     "installation": "Upload the ZIP in Plugins \u2192 Add New \u2192 Upload Plugin. Activate it, then configure it under Settings \u2192 Propeller Embed.",
     "changelog": "= 1.3.14 =\n* Version bump.\n\n= 1.3.13 =\n* Fixed an issue where self-hosted auto-updates were not working.\n\n= 1.3.9 =\n* Added [propeller_embed_switcher] for true one-at-a-time iframe loading.\n* Added dynamic re-initialization for embeds inserted after page load.\n* Updated the bundled JSON manifest author and homepage fields.\n\n= 1.3.8 =\n* Added redundant instance fields in handshake init payload.\n* Parent now accepts instanceId aliases in iframe messages for more resilient GTM integrations."
   },
-  "author": "Propeller Bonds"
+  "author": "Propeller Bonds "
 }
