@@ -3,16 +3,26 @@
  * Plugin Name: Propeller Embed
  * Plugin URI: https://www.propellerbonds.com/propeller-embed-plugin
  * Description: Embeds a Propeller app in WordPress with third-party cookie guidance, retry support, an admin settings page, and self-hosted auto-updates.
- * Version: 1.3.10
+ * Version: 1.3.13
  * Author: Propeller Bonds
  * License: GPL-2.0-or-later
  * Text Domain: propeller-embed
  */
 
+/* Define FILTER_VALIDATE_BOOLEAN if it's missing (e.g., in older PHP versions)
+By adding this check, you are making the plugin more resilient and silencing 
+the error from your development tools without needing to change your 
+local environment configuration or install WordPress.
+
+
 if (!defined('ABSPATH')) {
     exit;
 }
 
+if (!defined('FILTER_VALIDATE_BOOLEAN')) {
+    define('FILTER_VALIDATE_BOOLEAN', 258);
+}
+*/
 final class Propeller_Embed_Plugin
 {
     private const OPTION_KEY = 'propeller_embed_settings';
@@ -20,7 +30,7 @@ final class Propeller_Embed_Plugin
     private const MENU_SLUG = 'propeller-embed-settings';
     private const SHORTCODE = 'propeller_embed';
     private const SWITCHER_SHORTCODE = 'propeller_embed_switcher';
-    private const VERSION = '1.3.10';
+    private const VERSION = '1.3.14';
     private const UPDATE_CACHE_KEY = 'propeller_embed_update_payload';
     private const UPDATE_CACHE_TTL = 3600;
 
@@ -118,7 +128,7 @@ final class Propeller_Embed_Plugin
             __('Self-hosted auto-update settings', 'propeller-embed'),
             function (): void {
                 echo '<p>' . esc_html__('Point the plugin at a JSON manifest hosted on your own site. WordPress will use that manifest to detect and install new versions.', 'propeller-embed') . '</p>';
-                echo '<p><code>' . esc_html__('https://www.propellerbonds.com/wp-content/uploads/propeller-embed/plugin-update.json', 'propeller-embed') . '</code></p>';
+                echo '<p><code>' . esc_html__('https://www.propellerbonds.com/wp-content/uploads/2026/05/propeller-embed-plugin.zip', 'propeller-embed') . '</code></p>';
             },
             self::MENU_SLUG
         );
@@ -172,6 +182,7 @@ final class Propeller_Embed_Plugin
         }
     }
 
+    /** @param mixed $input */
     public function sanitize_settings($input): array
     {
         $defaults = $this->get_default_settings();
@@ -426,17 +437,18 @@ final class Propeller_Embed_Plugin
             <div style="margin-top:24px;max-width:1100px;">
                 <h2><?php echo esc_html__('Recommended JSON manifest', 'propeller-embed'); ?></h2>
                 <pre style="background:#fff;padding:16px;border:1px solid #dcdcde;overflow:auto;">{
-  "name": "Propeller Embed",
+  "name": "Get Bonds",
   "slug": "propeller-embed-plugin",
-  "version": "1.3.11",
+  
   "author": "Propeller Bonds",
   "channel": "stable",
-  "homepage": "https://www.propellerbonds.com/propeller-embed-plugin",
-  "download_url": "https://www.propellerbonds.com/wp-content/uploads/2026/03/propeller-embed-plugin-v1.3.10.zip",
+
+  "homepage": "https://www.propellerbonds.com/propeller-embed-plugins",
+  "download_url": "https://www.propellerbonds.com/wp-content/uploads/2026/05/propeller-embed-plugin.zip",
   "requires": "6.0",
   "tested": "6.8",
   "requires_php": "7.4",
-  "last_updated": "2026-03-27",
+  "last_updated": "2026-05-13",
   "sections": {
     "description": "Embeds a Propeller app in WordPress with cookie guidance, retry support, one-at-a-time dropdown switching, dynamic embed initialization, and self-hosted auto-updates.",
     "installation": "Upload the ZIP in Plugins → Add New → Upload Plugin. Activate it, then configure it under Settings → Propeller Embed.",
@@ -732,6 +744,10 @@ final class Propeller_Embed_Plugin
         return (string) ob_get_clean();
     }
 
+    /**
+     * @param  mixed $transient
+     * @return mixed
+     */
     public function inject_update_information($transient)
     {
         if (!is_object($transient) || empty($transient->checked)) {
@@ -761,6 +777,10 @@ final class Propeller_Embed_Plugin
         return $transient;
     }
 
+    /**
+     * @param  mixed $result
+     * @return mixed
+     */
     public function filter_plugins_api($result, string $action, object $args)
     {
         if ($action !== 'plugin_information' || empty($args->slug) || $args->slug !== dirname(plugin_basename(__FILE__))) {
@@ -780,7 +800,7 @@ final class Propeller_Embed_Plugin
         }
 
         return (object) [
-            'name' => (string) ($manifest['name'] ?? 'Propeller Embed'),
+            'name' => (string) ($manifest['name'] ?? 'Get Bonds'),
             'slug' => dirname(plugin_basename(__FILE__)),
             'version' => (string) ($manifest['version'] ?? self::VERSION),
             'author' => '<a href="' . esc_url((string) ($manifest['homepage'] ?? $settings['plugin_homepage'])) . '">' . esc_html((string) ($manifest['author'] ?? 'Propeller Bonds')) . '</a>',
@@ -832,6 +852,7 @@ final class Propeller_Embed_Plugin
         exit;
     }
 
+    /** @param mixed $upgrader */
     public function clear_update_cache_after_upgrade($upgrader, array $hook_extra): void
     {
         if (($hook_extra['type'] ?? '') !== 'plugin') {
@@ -892,28 +913,62 @@ final class Propeller_Embed_Plugin
 
     private function get_default_settings(): array
     {
-        return [
-            'iframe_src' => 'https://yourwebsite.propeller.insure/axelerator-public',
+        // Base hardcoded defaults — act as a safe fallback if the local JSON is missing or malformed.
+        $defaults = [
+            'iframe_src'              => 'https://yourwebsite.propeller.insure/axelerator-public',
             'iframe_path_for_new_tab' => '/axelerator-public',
-            'iframe_width' => '90%',
-            'iframe_height' => 1000,
-            'initial_timeout_ms' => 8000,
-            'expected_message_type' => 'propeller-page-state',
-            'allowed_iframe_origins' => "https://propellerwebsite.propeller.insure\nhttps://yourwebsite.propeller.insure",
-            'iframe_allow' => 'storage-access; fullscreen',
-            'iframe_sandbox' => '',
-            'iframe_referrerpolicy' => 'strict-origin-when-cross-origin',
-            'iframe_loading' => 'lazy',
-            'debug' => '0',
-            'warning_title' => 'Third-party cookies might be blocked.',
-            'warning_body' => 'This embedded app needs cookies from ',
-            'retry_button_label' => 'I changed settings — Retry',
-            'new_tab_label' => 'Open in a new tab (recommended)',
-            'help_html' => '<p><strong>Chrome:</strong> Settings → Privacy &amp; security → Third-party cookies → allow them, or add an exception for the relevant domain.</p><p><strong>Safari:</strong> Settings → Privacy → turn off <em>Prevent cross-site tracking</em>.</p><p><strong>Firefox:</strong> Settings → Privacy &amp; Security → Enhanced Tracking Protection → Standard, or add an exception.</p><p>After changing the setting, reload this page or click Retry.</p>',
-            'update_json_url' => 'https://www.propellerbonds.com/wp-content/uploads/2026/03/plugin-update.json',
-            'plugin_homepage' => 'https://www.propellerbonds.com/propeller-embed-plugin',
-            'release_channel' => 'stable',
+            'iframe_width'            => '90%',
+            'iframe_height'           => 1000,
+            'initial_timeout_ms'      => 8000,
+            'expected_message_type'   => 'propeller-page-state',
+            'allowed_iframe_origins'  => "https://propellerwebsite.propeller.insure\nhttps://yourwebsite.propeller.insure",
+            'iframe_allow'            => 'storage-access; fullscreen',
+            'iframe_sandbox'          => '',
+            'iframe_referrerpolicy'   => 'strict-origin-when-cross-origin',
+            'iframe_loading'          => 'lazy',
+            'debug'                   => '0',
+            'warning_title'           => 'Third-party cookies might be blocked.',
+            'warning_body'            => 'This embedded app needs cookies from ',
+            'retry_button_label'      => 'I changed settings — Retry',
+            'new_tab_label'           => 'Open in a new tab (recommended)',
+            'help_html'               => '<p><strong>Chrome:</strong> Settings → Privacy &amp; security → Third-party cookies → allow them, or add an exception for the relevant domain.</p><p><strong>Safari:</strong> Settings → Privacy → turn off <em>Prevent cross-site tracking</em>.</p><p><strong>Firefox:</strong> Settings → Privacy &amp; Security → Enhanced Tracking Protection → Standard, or add an exception.</p><p>After changing the setting, reload this page or click Retry.</p>',
+            'update_json_url'         => 'https://www.propellerbonds.com/wp-content/uploads/2026/03/plugin-update.json',
+            'plugin_homepage'         => 'https://www.propellerbonds.com/propeller-embed-plugin',
+            'release_channel'         => 'stable',
         ];
+
+        // Merge applicable values from the bundled plugin-update.json.
+        // Reading is done once per request via a static cache to avoid repeated disk I/O.
+        static $json_defaults = null;
+        if ($json_defaults === null) {
+            $json_file = __DIR__ . '/plugin-update.json';
+            $json_defaults = [];
+
+            if (is_readable($json_file)) {
+                $raw = file_get_contents($json_file); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+                if ($raw !== false) {
+                    $parsed = json_decode($raw, true);
+                    if (is_array($parsed)) {
+                        // Map JSON fields → settings keys where applicable.
+                        // 'update_json_url' is intentionally excluded: it points *to* the remote
+                        // manifest and cannot be derived from the local copy.
+                        $field_map = [
+                            'name' => 'name',
+                            'homepage' => 'plugin_homepage',
+                            'channel'  => 'release_channel',
+                            'version' => 'version',
+                        ];
+                        foreach ($field_map as $json_key => $setting_key) {
+                            if (isset($parsed[$json_key]) && is_string($parsed[$json_key]) && $parsed[$json_key] !== '') {
+                                    $json_defaults[$setting_key] = $parsed[$json_key];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return array_merge($defaults, $json_defaults);
     }
 
     private function get_remote_update_manifest(bool $force_refresh): ?array
@@ -970,7 +1025,7 @@ final class Propeller_Embed_Plugin
     private function sanitize_update_manifest(array $manifest): array
     {
         $clean = [];
-        $clean['name'] = sanitize_text_field($manifest['name'] ?? 'Propeller Embed');
+        $clean['name'] = sanitize_text_field($manifest['name'] ?? 'Get Bonds');
         $clean['slug'] = sanitize_key($manifest['slug'] ?? dirname(plugin_basename(__FILE__)));
         $clean['version'] = sanitize_text_field($manifest['version'] ?? '');
         $clean['author'] = sanitize_text_field($manifest['author'] ?? 'Propeller Bonds');
@@ -1022,12 +1077,14 @@ final class Propeller_Embed_Plugin
         delete_site_transient('update_plugins');
     }
 
+    /** @param mixed $value */
     private function sanitize_positive_int($value, int $fallback): int
     {
         $value = absint($value);
         return $value > 0 ? $value : $fallback;
     }
 
+    /** @param mixed $value */
     private function sanitize_width($value): string
     {
         $value = trim((string) $value);
@@ -1050,6 +1107,7 @@ final class Propeller_Embed_Plugin
         return '90%';
     }
 
+    /** @param mixed $value */
     private function sanitize_path($value): string
     {
         $value = trim((string) $value);
@@ -1064,6 +1122,7 @@ final class Propeller_Embed_Plugin
         return preg_replace('#/+#', '/', $value) ?: '/axelerator-public';
     }
 
+    /** @param mixed $value */
     private function sanitize_origins_text($value): string
     {
         $origins = $this->normalize_origins_text_to_array((string) $value);
@@ -1102,6 +1161,7 @@ final class Propeller_Embed_Plugin
         return array_values(array_unique($origins));
     }
 
+    /** @param mixed $value */
     private function sanitize_allow_attribute($value): string
     {
         $value = trim((string) $value);
@@ -1126,6 +1186,7 @@ final class Propeller_Embed_Plugin
         return $clean ? implode('; ', array_values(array_unique($clean))) : 'storage-access; fullscreen';
     }
 
+    /** @param mixed $value */
     private function sanitize_sandbox_attribute($value): string
     {
         $value = trim((string) $value);
@@ -1162,6 +1223,7 @@ final class Propeller_Embed_Plugin
         return implode(' ', array_values(array_unique($clean)));
     }
 
+    /** @param mixed $value */
     private function sanitize_referrerpolicy($value): string
     {
         $allowed = [
@@ -1179,12 +1241,14 @@ final class Propeller_Embed_Plugin
         return in_array($value, $allowed, true) ? $value : 'strict-origin-when-cross-origin';
     }
 
+    /** @param mixed $value */
     private function sanitize_loading($value): string
     {
         $value = strtolower(trim((string) $value));
         return in_array($value, ['lazy', 'eager'], true) ? $value : 'lazy';
     }
 
+    /** @param mixed $value */
     private function sanitize_release_channel($value): string
     {
         $value = strtolower(trim((string) $value));

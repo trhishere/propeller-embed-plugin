@@ -1,0 +1,4 @@
+Also note: the VERSION const in propeller-embed.php still needs to be updated manually alongside
+the version field in this JSON. The code we added earlier reads homepage and channel from the JSON automatically, 
+but version is a constant and PHP constants can't be set at runtime from a file — 
+that one still requires a manual edit when you publish.
